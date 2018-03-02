@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+ {% block page_content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<div class="container centered col-xs-10" style="float:none; margin: 0 auto">
+
+  <form  action="" method="post" role="form">
+    <h2>Manual Control:</h2>
+    <table class="table">
+      <tr> <p></br></p></tr>
+      <tr>
+          <td style="border: none;"><input type="submit" class="btn btn-success btn-lg" name=submit value="Heat On"></td>
+          <td style="border: none;"><input type="submit" class="btn btn-success btn-lg" name=submit value="Heat Off"></td>
+      </tr>
+      <tr>
+        <td style="border: none;"><p></p></td>
+        <td style="border: none;"><p></p></td>
+      </tr>
+      <tr>
+        <td style="border: none;"><input type="submit" class="btn btn-success btn-lg mon" name=submit value="Motor On"></td>
+        <td style="border: none;"><input type="submit" class="btn btn-success btn-lg moff" name=submit value="Motor Off"></td>
+      </tr>
+    </table>
+  </form>
+
+  <div class="alert alert-info">
+    <strong>{{ message }} </strong>
+
+  </div> 
+
+</div>
+<!-- Display the countdown timer in an element -->
+
+<script>
+// $('.moff').on('click',function() {
+//     $(this).prop("disabled",true);
+//     $('.mon').prop("disabled",false);
+// });
+// $('.mon').on('click',function() {
+//     $(this).prop("disabled",true);
+//     $('.moff').prop("disabled",false);
+// });
+
+</script>
+</div>
+{% endblock %}
