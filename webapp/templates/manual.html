@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
  {% block page_content %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <div class="container centered col-xs-10" style="float:none; margin: 0 auto">
 
@@ -24,24 +24,13 @@
     </table>
   </form>
 
-  <div class="alert alert-info">
-    <strong>{{ message }} </strong>
-
-  </div> 
-
+  <div id="msg"></div> 
 </div>
-<!-- Display the countdown timer in an element -->
 
 <script>
-// $('.moff').on('click',function() {
-//     $(this).prop("disabled",true);
-//     $('.mon').prop("disabled",false);
-// });
-// $('.mon').on('click',function() {
-//     $(this).prop("disabled",true);
-//     $('.moff').prop("disabled",false);
-// });
-
+  $("input").click(function() {
+     $('#msg').replaceWith('<div class="msg alert alert-info"><strong>{{ message }}</strong></div>');
+  });   
 </script>
-</div>
+
 {% endblock %}

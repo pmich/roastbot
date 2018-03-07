@@ -8,135 +8,46 @@
     {{ form.csrf }}
     <div class="form-group input-group-lg">
       <h2> Roasting Time:</h2>
-      <input type="text" class="form-control" id="name" name="name" placeholder="Enter time in minutes to roast for.">
+      <input type="text" class="roasttime form-control" id="name" name="name" placeholder="Enter time in minutes...">
     </div>
     <button type="submit" class="btn btn-success btn-lg" id="startbutton">Start</button>
   </form>
- 
   <br>
-<!--   {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-          <ul>
-              {% for message in messages %}
-                  <li>{{ message[1] }}</li>
-              {% endfor %}
-          </ul>
-                  {% for message in messages %}
-      {% if "Error" not in message[1]: %}
-          <div class="alert alert-info">
-          <strong>Roasting for: </strong>
-
-          <p id="demo"></p>
-          </div>
-      {% endif %}
-
-      {% if "Error" in message[1]: %}
-          <div class="alert alert-warning">
-          {{ message[1] }}
-          </div>
-      {% endif %}
-  {% endfor %}
-      {% endif %}
-  {% endwith %} -->
-         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
- 
-        {% for message in messages %}
-            {% if "Error" not in message[1]: %}
-                <div class="alert alert-info">
-                  <!-- <p id="count"></p> -->
-                  <strong id="message">{{ message[1] }}</strong>
-                  <!-- <p id="timer"></p> -->
-                </div>
-            {% endif %}
- 
-            {% if "Error" in message[1]: %}
-                <div class="alert alert-warning">
-                {{ message[1] }}
-                </div>
-            {% endif %}
-        {% endfor %}
-            {% endif %}
-        {% endwith %}
-    <div class="alert alert-info">
-      <p id="count"></p>
-    </div>
-    <div class="alert alert-info">
-      <p id="timer"></p>
-    </div>
+  <div class="msg-roasttime"></div>
+  <div class="msg-wrapper" id="demo"></div>
 </div>
 
 <script type="text/javascript">
-var countdown =  6; 
-var counter =  $('#message').text() * 60 * 1000;
-// $('#count').text("Seconds to go " + counter);
-console.log("timer started 1");
-
-$(document).ready(function(){
-  $("button").on('click', '#startbutton', function(){
-      alert("Hi");
-    // countdowninterval();
-    // var y = setInterval("timer()", 1000);
-  });
-});
-
-function countdowninterval() {
-  var x = setInterval("countdown()", 1000); 
-}
-
-function countdown() {
-  counterdown--;
-  $('#count').text("Starting in " + countdown);
-  console.log("counterdown started");
-  // if (counterdown < 0) {
-  //   clearInterval(x);
-  //   $('#count').hide();
-  // }
-}
-
-function timer() {
-  counter--;
-  var minutes = Math.floor((counter % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((counter % (1000 * 60)) / 1000);
-  $('#timer').text(minutes + "m " + seconds + "s ");
-  console.log("timer started");
-  // if (counter < 0) {
-  //   clearInterval(y);
-  //   $('#timer').text("Finished");
-  // }
-}
-
-// var timer = new Date().getTime() + (1000*60*{{ name }}+2000) ;
-// // var countDownDate = new Date("Feb 15, 2018 14:43:25").getTime();
-
-// // Update the count down every 1 second
-// var x = setInterval(function() {
-
-//   // Get todays date and time
-//   var now = new Date().getTime();
-
-//   // Find the distance between now an the count down date
-//   var distance =  timer - now ;
-//   console.log("distance " + distance + ", timer " + timer + ", now " + now)
-
-//   // Time calculations for days, hours, minutes and seconds
-//   // var days = Math.floor(distance / 60 * 60 * 24));
-//   // var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-//   var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-//   // Display the result in the element with id="demo"
-//   document.getElementById("demo").innerHTML =  minutes + "m " + seconds + "s ";
-
-//   // If the count down is finished, write some text 
-//   if (distance < 0) {
-//     clearInterval(x);
-//     document.getElementById("demo").innerHTML = "Finished!";
-//     // xhttp.open("POST", "index.html", true);
-//     // // xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-//     // xhttp.send("state=finished");
-
-// }, 1000);
+  var socket = io.connect('http://192.168.0.91:5000/')
+  roast_time=""
+  var form = $('form').on('submit', function( e ) {
+    e.preventDefault()
+    var roast_time = $('input.roasttime').val()*1000*60
+    var start_time = new Date().getTime()
+    console.log( "roast time is ", roast_time )
+    console.log( "start time is ", start_time )
+    var min = Math.floor((roast_time % (1000 * 60 * 60)) / (1000 * 60));
+    var sec = Math.floor((roast_time % (1000 * 60)) / 1000);
+     $('div.msg-roasttime').append('<div class="msgbbl alert alert-info"><b> Roast time is: </b>'+min+'m '+sec+' s</div>')
+    socket.emit( 'my event', {
+      roasttime: roast_time,
+      starttime: start_time
+    })
+    //empty message field
+    $('input.roasttime').val('').focus()
+  })
+  //capture message from the server
+  socket.on('my response', function(msg) {
+    var minutes = Math.floor((msg.timeleft % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((msg.timeleft % (1000 * 60)) / 1000);
+    if(typeof msg !== 'undefined'){
+      $('div.msg-roasttime').html('<div class="msgbbl alert alert-info"><b> Roast time is: </b>'+minutes+'m '+seconds+' s')
+      if(msg.msg == 'Finished!'){
+        $('div.msg-roasttime').html('<div class="msgbbl alert alert-danger"><b>'+msg.msg+'<b></div>') 
+      }
+  }
+  console.log(msg)
+})       
 </script>
 
 {% endblock %}
